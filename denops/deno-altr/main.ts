@@ -14,6 +14,34 @@ export async function main(denops: Denops): Promise<void> {
 
       return await Promise.resolve();
     },
+    async ask(text: unknown): Promise<unknown> {
+      console.log("ask");
+
+      let choice: number | null;
+
+      try {
+        choice = (await denops.call(
+          "confirm",
+          "heyhey hey",
+          "A answer\nB answer"
+        )) as number | null;
+      } catch (e) {
+        console.error(e);
+        choice = 0;
+      }
+
+      console.log(choice);
+
+      if (!choice) {
+        return await Promise.resolve();
+      }
+      if (choice == 0) {
+        console.log("cancel");
+        return await Promise.resolve();
+      }
+
+      return await Promise.resolve();
+    },
     async nextFile(text: unknown): Promise<unknown> {
       const currentFilePath = (await denops.call("expand", "%:p")) as
         | string
