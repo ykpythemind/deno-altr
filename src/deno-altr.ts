@@ -1,10 +1,10 @@
 // todo: multiple destfile??
-export interface DestFile {
+export interface AltrFile {
   path?: string;
 }
 
-export const findNextFile = async (currentFile: string): Promise<DestFile> => {
-  let dest: DestFile = {};
+export const findNextFile = async (currentFile: string): Promise<AltrFile> => {
+  let dest: AltrFile = {};
 
   if (currentFile.includes("app/")) {
     let newPath = currentFile
