@@ -12,7 +12,7 @@ export const find = async (currentFile: string): Promise<AltrFile | null> => {
   const target = searchCandidate(currentFile);
 
   if (!target) {
-    return Promise.resolve(null);
+    return null;
   }
 
   const fileExists = await exists(target);
