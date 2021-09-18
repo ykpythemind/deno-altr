@@ -3,6 +3,8 @@ import { execute } from "https://deno.land/x/denops_std@v1.11.2/helper/mod.ts#^"
 
 import { exists } from "https://deno.land/std@0.106.0/fs/mod.ts";
 
+import { findNextFile } from "../../src/deno-altr.ts";
+
 export async function main(denops: Denops): Promise<void> {
   // Plugin program starts from here
 
@@ -38,36 +40,3 @@ export async function main(denops: Denops): Promise<void> {
     `command! -nargs=0 NextFile echomsg denops#request('${denops.name}', 'nextFile', [])`
   );
 }
-
-// todo: multiple destfile??
-interface DestFile {
-  path?: string;
-}
-
-const findNextFile = async (currentFile: string): Promise<DestFile> => {
-  let dest: DestFile = {};
-
-  if (currentFile.includes("app/")) {
-    let newPath = currentFile
-      .replace("/app/", "/spec/")
-      .replace(".rb", "_spec.rb");
-
-    if (currentFile.includes("/controllers/")) {
-      newPath = newPath.replace("/controllers/", "/requests/");
-    }
-
-    dest.path = newPath;
-  } else if (currentFile.endsWith("_spec.rb")) {
-    let newPath = currentFile
-      .replace("/spec/", "/app/")
-      .replace("_spec.rb", ".rb");
-
-    if (currentFile.includes("/requests/")) {
-      newPath = newPath.replace("/requests/", "/controllers/");
-    }
-
-    dest.path = newPath;
-  }
-
-  return dest;
-};
