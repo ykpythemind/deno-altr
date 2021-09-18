@@ -1,11 +1,26 @@
+import { exists } from "https://deno.land/std@0.106.0/fs/mod.ts";
+
 // todo: multiple destfile??
 export interface AltrFile {
-  path?: string;
+  path: string;
+  exists: boolean;
 }
 
-export const findNextFile = async (currentFile: string): Promise<AltrFile> => {
-  let dest: AltrFile = {};
+type fileCandidate = string;
 
+export const find = async (currentFile: string): Promise<AltrFile | null> => {
+  const target = searchCandidate(currentFile);
+
+  if (!target) {
+    return Promise.resolve(null);
+  }
+
+  const fileExists = await exists(target);
+
+  return { path: target, exists: fileExists };
+};
+
+export const searchCandidate = (currentFile: string): fileCandidate | null => {
   if (currentFile.includes("app/")) {
     let newPath = currentFile
       .replace("/app/", "/spec/")
@@ -15,7 +30,7 @@ export const findNextFile = async (currentFile: string): Promise<AltrFile> => {
       newPath = newPath.replace("/controllers/", "/requests/");
     }
 
-    dest.path = newPath;
+    return newPath;
   } else if (currentFile.endsWith("_spec.rb")) {
     let newPath = currentFile
       .replace("/spec/", "/app/")
@@ -25,8 +40,9 @@ export const findNextFile = async (currentFile: string): Promise<AltrFile> => {
       newPath = newPath.replace("/requests/", "/controllers/");
     }
 
-    dest.path = newPath;
+    return newPath;
   }
 
-  return dest;
+  // found nothing
+  return null;
 };

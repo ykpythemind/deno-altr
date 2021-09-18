@@ -1,9 +1,7 @@
 import { Denops } from "https://deno.land/x/denops_std@v1.11.2/mod.ts#^";
 import { execute } from "https://deno.land/x/denops_std@v1.11.2/helper/mod.ts#^";
 
-import { exists } from "https://deno.land/std@0.106.0/fs/mod.ts";
-
-import { findNextFile } from "../../src/deno-altr.ts";
+import { find } from "../../src/deno-altr.ts";
 
 export async function main(denops: Denops): Promise<void> {
   // Plugin program starts from here
@@ -53,10 +51,34 @@ export async function main(denops: Denops): Promise<void> {
         return await Promise.resolve();
       }
 
-      const nf = await findNextFile(currentFilePath);
-      if (nf.path) {
-        // todo: is file exists?
-        await denops.cmd(`edit ${nf.path}`);
+      const altrFile = await find(currentFilePath);
+      if (!altrFile) {
+        console.error("altr file not found");
+        return await Promise.resolve();
+      }
+
+      let doEdit = true;
+
+      if (!altrFile.exists) {
+        let choice: number | null;
+
+        try {
+          choice = (await denops.call(
+            "confirm",
+            `${altrFile.path} does not exist. edit?`,
+            "y yes\nn no"
+          )) as number | null;
+        } catch (e) {
+          choice = 0;
+        }
+
+        if (!choice || choice === 0) {
+          doEdit = false;
+        }
+      }
+
+      if (doEdit) {
+        await denops.cmd(`edit ${altrFile.path}`);
       }
 
       return await Promise.resolve();
