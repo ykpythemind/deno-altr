@@ -6,7 +6,7 @@ export interface AltrFile {
   exists: boolean;
 }
 
-type fileCandidate = string;
+export type FileCandidate = string;
 
 export const find = async (currentFile: string): Promise<AltrFile | null> => {
   const target = searchCandidate(currentFile);
@@ -20,7 +20,7 @@ export const find = async (currentFile: string): Promise<AltrFile | null> => {
   return { path: target, exists: fileExists };
 };
 
-export const searchCandidate = (currentFile: string): fileCandidate | null => {
+export const searchCandidate = (currentFile: string): FileCandidate | null => {
   if (currentFile.includes("app/")) {
     let newPath = currentFile
       .replace("/app/", "/spec/")
