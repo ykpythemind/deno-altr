@@ -6,10 +6,24 @@ export interface AltrFile {
   exists: boolean;
 }
 
-export type FileCandidate = string;
+interface findOption {
+  currentFile: string;
+  vimFileType: string;
+}
 
-export const find = async (currentFile: string): Promise<AltrFile | null> => {
-  const target = searchCandidate(currentFile);
+type FileCandidate = string;
+
+export const find = async ({
+  currentFile,
+  vimFileType,
+}: findOption): Promise<AltrFile | null> => {
+  let target: FileCandidate | null = null;
+
+  if (vimFileType === "ruby") {
+    target = searchCandidateRuby(currentFile);
+  } else if (vimFileType === "go") {
+    target = searchCandidateGo(currentFile);
+  }
 
   if (!target) {
     return null;
@@ -20,7 +34,7 @@ export const find = async (currentFile: string): Promise<AltrFile | null> => {
   return { path: target, exists: fileExists };
 };
 
-export const searchCandidate = (currentFile: string): FileCandidate | null => {
+const searchCandidateRuby = (currentFile: string): FileCandidate | null => {
   if (currentFile.includes("app/")) {
     let newPath = currentFile
       .replace("/app/", "/spec/")
@@ -45,4 +59,12 @@ export const searchCandidate = (currentFile: string): FileCandidate | null => {
 
   // found nothing
   return null;
+};
+
+const searchCandidateGo = (currentFile: string): FileCandidate | null => {
+  if (currentFile.endsWith("_test.go")) {
+    return currentFile.replace("_test", "");
+  } else {
+    return currentFile.replace(/\.go$/, "_test.go");
+  }
 };

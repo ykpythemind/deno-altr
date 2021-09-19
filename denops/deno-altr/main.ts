@@ -8,7 +8,8 @@ export async function main(denops: Denops): Promise<void> {
 
   denops.dispatcher = {
     async echo(text: unknown): Promise<unknown> {
-      console.log("echo");
+      const a = (await denops.eval("&filetype")) as string;
+      console.log(typeof a);
 
       return await Promise.resolve();
     },
@@ -41,17 +42,20 @@ export async function main(denops: Denops): Promise<void> {
       return await Promise.resolve();
     },
     async nextFile(text: unknown): Promise<unknown> {
-      const currentFilePath = (await denops.call("expand", "%:p")) as
-        | string
-        | null;
+      const currentFile = (await denops.call("expand", "%:p")) as string | null;
 
-      console.log(currentFilePath);
+      console.log(currentFile);
 
-      if (!currentFilePath) {
+      if (!currentFile) {
         return await Promise.resolve();
       }
 
-      const altrFile = await find(currentFilePath);
+      const vimFileType = (await denops.eval("&filetype")) as string;
+
+      const altrFile = await find({
+        currentFile,
+        vimFileType,
+      });
       if (!altrFile) {
         console.error("altr file not found");
         return await Promise.resolve();
@@ -72,7 +76,8 @@ export async function main(denops: Denops): Promise<void> {
           choice = 0;
         }
 
-        if (!choice || choice === 0) {
+        // cancel or no
+        if (choice === 0 || choice === 2) {
           doEdit = false;
         }
       }
