@@ -11,7 +11,7 @@ interface findOption {
   vimFileType: string;
 }
 
-type FileCandidate = string;
+export type FileCandidate = string;
 
 export const find = async ({
   currentFile,
@@ -34,7 +34,9 @@ export const find = async ({
   return { path: target, exists: fileExists };
 };
 
-const searchCandidateRuby = (currentFile: string): FileCandidate | null => {
+export const searchCandidateRuby = (
+  currentFile: string
+): FileCandidate | null => {
   if (currentFile.includes("app/")) {
     let newPath = currentFile
       .replace("/app/", "/spec/")
@@ -61,7 +63,9 @@ const searchCandidateRuby = (currentFile: string): FileCandidate | null => {
   return null;
 };
 
-const searchCandidateGo = (currentFile: string): FileCandidate | null => {
+export const searchCandidateGo = (
+  currentFile: string
+): FileCandidate | null => {
   if (currentFile.endsWith("_test.go")) {
     return currentFile.replace("_test", "");
   } else {
